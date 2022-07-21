@@ -1,3 +1,5 @@
+
+
 from dataclasses import dataclass, asdict
 from typing import Dict
 
@@ -13,8 +15,8 @@ class InfoMessage:
     calories: float
     MESSAGE: str = (
         'Тип тренировки: {training_type}; '
-        'Длительность: {duration:.3f} ч.; '    # строка
-        'Дистанция: {distance:.3f} км; '       # сообщения
+        'Длительность: {duration:.3f} ч.; '
+        'Дистанция: {distance:.3f} км; '
         'Ср. скорость: {speed:.3f} км/ч; '
         'Потрачено ккал: {calories:.3f}.')
 
@@ -26,12 +28,12 @@ class InfoMessage:
 @dataclass
 class Training:
     """Базовый класс тренировки."""
-    action: int   # кол-во выполненных движений
-    duration: float   # длительность тренировки
-    weight: float   # вес
-    LEN_STEP: float = 0.65   # длина 1 шага
-    M_IN_KM: int = 1000   # длинна км(м)
-    M_IN_HOUR: int = 60   # минут в часе
+    action: int
+    duration: float
+    weight: float
+    LEN_STEP: float = 0.65
+    M_IN_KM: int = 1000
+    M_IN_HOUR: int = 60
     height: int = 1
 
     def get_distance(self) -> float:
@@ -39,13 +41,13 @@ class Training:
 
         return (self.action
                 * self.LEN_STEP
-                / self.M_IN_KM)   # формула расчета дистанции
+                / self.M_IN_KM)
 
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения."""
 
         return(self.get_distance()
-               / self.duration)   # формула ср. скор.
+               / self.duration)
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
@@ -66,35 +68,35 @@ class Running(Training):
     action: int
     duration: float
     weight: float
-    coef_calorie_run_1: int = 18   # коэффициент каллорий при беге 1
-    coef_calorie_run_2: int = 20   # коэффициент каллорий при беге 2
+    coef_calorie_run_1: int = 18
+    coef_calorie_run_2: int = 20
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
 
-        return ((self.coef_calorie_run_1           # формула
-                * self.get_mean_speed()            # потраченных
-                - self.coef_calorie_run_2)         # каллорий
-                * self.weight / self.M_IN_KM       # при
-                * self.duration * self.M_IN_HOUR   # беге
+        return ((self.coef_calorie_run_1
+                * self.get_mean_speed()
+                - self.coef_calorie_run_2)
+                * self.weight / self.M_IN_KM
+                * self.duration * self.M_IN_HOUR
                 )
 
 
-class SportsWalking(Training):   # создание дочернего класса
+class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
 
-    coef_calorie_walk_1: float = 0.035   # коэффициент каллорий при ходьбе 1
-    coef_calorie_walk_2: int = 2         # коэффициент каллорий при ходьбе 2
-    coef_calorie_walk_3: float = 0.029   # коэффициент каллорий при ходьбе 3
+    coef_calorie_walk_1: float = 0.035
+    coef_calorie_walk_2: int = 2
+    coef_calorie_walk_3: float = 0.029
 
-    def __init__(self,   # конструктор класса-наследника
-                 action: int,      #
-                 duration: float,  # аргументы
-                 weight: float,    # конструктора
-                 height: float     #
+    def __init__(self,
+                 action: int,
+                 duration: float,
+                 weight: float,
+                 height: float
                  ) -> None:
-        super().__init__(action, duration, weight)   # наследование
-        self.height = height   # добавление нового свойства
+        super().__init__(action, duration, weight)
+        self.height = height
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
@@ -102,7 +104,7 @@ class SportsWalking(Training):   # создание дочернего клас�
                 * self.weight
                 + (self.get_mean_speed()
                  ** self.coef_calorie_walk_2
-                 // self.height)  # формула каллорий
+                 // self.height)
                 * self.coef_calorie_walk_3 * self.weight)
                 * (self.duration
                 * self.M_IN_HOUR))
@@ -111,9 +113,9 @@ class SportsWalking(Training):   # создание дочернего клас�
 class Swimming(Training):
     """Тренировка: плавание."""
 
-    LEN_STEP: float = 1.38  # длинна гребка(м)
-    coef_callorie_swim_1: float = 1.1  # коэффициент каллорий при плавании 1
-    coef_callorie_swim_2: int = 2  # коэффициент каллорий при плавании 2
+    LEN_STEP: float = 1.38
+    coef_callorie_swim_1: float = 1.1
+    coef_callorie_swim_2: int = 2
     length_pool: int = 25
 
     def __init__(self,
@@ -124,30 +126,30 @@ class Swimming(Training):
                  count_pool: int,
                  LEN_STEP: float = 1.38
                  ) -> None:
-        super().__init__(action, duration, weight, LEN_STEP)  # наследование
-        self.length_pool: int = length_pool  # свойство длинны бассейна
-        self.count_pool: int = count_pool  # переплываний бассейна
+        super().__init__(action, duration, weight, LEN_STEP)
+        self.length_pool: int = length_pool
+        self.count_pool: int = count_pool
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        return ((self.get_mean_speed()        # формула
-                + self.coef_callorie_swim_1)  # каллорий
+        return ((self.get_mean_speed()
+                + self.coef_callorie_swim_1)
                 * self.coef_callorie_swim_2
                 * self.weight)
 
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость плавания."""
-        return (self.length_pool   # формула
-                * self.count_pool  # средней скорости
-                / self.M_IN_KM     # при плавании
+        return (self.length_pool
+                * self.count_pool
+                / self.M_IN_KM
                 / self.duration)
 
 
 def read_package(workout_type: str, data: list):
     """Чтение данных."""
-    my_dict: Dict[str, list] = {'SWM': Swimming,            # словарь
-                                'RUN': Running,             # с
-                                'WLK': SportsWalking}       # данными
+    my_dict: Dict[str, list] = {'SWM': Swimming,
+                                'RUN': Running,
+                                'WLK': SportsWalking}
 
     if workout_type in my_dict.keys():
         return (my_dict.get(workout_type)(*data))
@@ -157,8 +159,8 @@ def read_package(workout_type: str, data: list):
 
 def main(training: Training) -> None:
     """Главная функция."""
-    info = training.show_training_info()  # сохранение объекта в переменную
-    print(info.get_message())  # вывод сообщения о тренировке
+    info = training.show_training_info()
+    print(info.get_message())
 
 
 if __name__ == 'main':
