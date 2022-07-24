@@ -1,7 +1,7 @@
 
 
 from dataclasses import dataclass, asdict
-from typing import Dict
+from typing import Dict, Type
 
 
 @dataclass
@@ -34,7 +34,6 @@ class Training:
     LEN_STEP: float = 0.65
     M_IN_KM: int = 1000
     M_IN_HOUR: int = 60
-    height: int = 1
 
     def get_distance(self) -> float:
         """Получить дистанцию в км."""
@@ -86,26 +85,26 @@ class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
 
     coef_calorie_walk_1: float = 0.035
-    coef_calorie_walk_2: int = 2
-    coef_calorie_walk_3: float = 0.029
+    coef_calorie_walk_2: float = 0.029
+    exponentiation_calorie_walk: int = 2
 
     def __init__(self,
                  action: int,
                  duration: float,
                  weight: float,
-                 height: float
+                 height: int
                  ) -> None:
         super().__init__(action, duration, weight)
-        self.height = height
+        self.height: int = height
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         return ((self.coef_calorie_walk_1
                 * self.weight
                 + (self.get_mean_speed()
-                 ** self.coef_calorie_walk_2
+                 ** self.exponentiation_calorie_walk
                  // self.height)
-                * self.coef_calorie_walk_3 * self.weight)
+                * self.coef_calorie_walk_2 * self.weight)
                 * (self.duration
                 * self.M_IN_HOUR))
 
@@ -116,18 +115,16 @@ class Swimming(Training):
     LEN_STEP: float = 1.38
     coef_callorie_swim_1: float = 1.1
     coef_callorie_swim_2: int = 2
-    length_pool: int = 25
 
     def __init__(self,
                  action: int,
                  duration: float,
                  weight: float,
-                 length_pool: int,
+                 length_pool: float,
                  count_pool: int,
-                 LEN_STEP: float = 1.38
                  ) -> None:
-        super().__init__(action, duration, weight, LEN_STEP)
-        self.length_pool: int = length_pool
+        super().__init__(action, duration, weight, LEN_STEP=1.38)
+        self.length_pool: float = length_pool
         self.count_pool: int = count_pool
 
     def get_spent_calories(self) -> float:
@@ -147,14 +144,13 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list):
     """Чтение данных."""
-    my_dict: Dict[str, list] = {'SWM': Swimming,
-                                'RUN': Running,
-                                'WLK': SportsWalking}
+    my_dict: Dict[str, Type[Training]] = {'SWM': Swimming,
+                                          'RUN': Running,
+                                          'WLK': SportsWalking}
 
-    if workout_type in my_dict.keys():
-        return (my_dict.get(workout_type)(*data))
-    else:
-        raise KeyError('Нет такой тренировки')
+    if workout_type in my_dict:
+        return (my_dict[workout_type](*data))
+    raise KeyError('Нет такой тренировки')
 
 
 def main(training: Training) -> None:
