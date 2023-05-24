@@ -1,4 +1,4 @@
-# Fitness tracker module based on OOP by [Denyacore](https://github.com/Denyacore)
+# Sport module based on OOP by [Denyacore](https://github.com/Denyacore)
 
 Модуль рассчитывает и отображает результаты тренировки.
 ## Authors
